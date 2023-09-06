@@ -16,31 +16,50 @@ class Tag(models.Model):
     color = models.CharField(max_length=7)
     slug = models.SlugField(max_length=200, unique=True)
 
+
 class Ingredient(models.Model):
     name = models.CharField(max_length=200)
     measurement_unit = models.CharField(max_length=200)
 
+
 class Recipe(models.Model):
     tags = models.ManyToManyField(Tag)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes')
-    ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
-    image = models.ImageField(upload_to='images/', blank=True) #поправить
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='recipes')
+    ingredients = models.ManyToManyField(
+        Ingredient, through='RecipeIngredient')
+    image = models.ImageField(upload_to='images/', blank=True)  # поправить
     text = models.TextField()
     name = models.CharField(max_length=200)
-    cooking_time = models.PositiveIntegerField(validators=[MinValueValidator(1, message='Так быстро ничего не приготовится')])
-    pub_date = models.DateTimeField('Дата добавления', auto_now_add=True, db_index=True)
+    cooking_time = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(
+                1, message='Так быстро ничего не приготовится')])
+    pub_date = models.DateTimeField(
+        'Дата добавления',
+        auto_now_add=True,
+        db_index=True)
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, null=True, on_delete=models.SET_NULL)
-    ingredient = models.ForeignKey(Ingredient, null=True, on_delete=models.SET_NULL)
-    amount = models.PositiveIntegerField(validators=[MinValueValidator(1, message='Нужно добавить что-то')])
+    ingredient = models.ForeignKey(
+        Ingredient, null=True, on_delete=models.SET_NULL)
+    amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(
+                1, message='Нужно добавить что-то')])
+
 
 class RecipeTag(models.Model):
-    recipe = recipe = models.ForeignKey(Recipe, null=True, on_delete=models.SET_NULL)
+    recipe = recipe = models.ForeignKey(
+        Recipe, null=True, on_delete=models.SET_NULL)
     tag = models.ForeignKey(Tag, null=True, on_delete=models.SET_NULL)
 
-#class Favourite(models.Model): #хз
-    #pass
+# class Favourite(models.Model): #хз
+    # pass
 
-#class Cart(models.Model):
+# class Cart(models.Model):
    # pass
