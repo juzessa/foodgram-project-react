@@ -11,6 +11,24 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
 
 
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following')
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'author'),
+                name='unique'
+            ),)
+
+
 class Tag(models.Model):
     name = models.CharField(max_length=200)
     color = models.CharField(max_length=7)
@@ -58,8 +76,10 @@ class RecipeTag(models.Model):
         Recipe, null=True, on_delete=models.SET_NULL)
     tag = models.ForeignKey(Tag, null=True, on_delete=models.SET_NULL)
 
-# class Favourite(models.Model): #хз
-    # pass
+class Favourite(models.Model):
+    recipe = models.ForeignKey(Recipe, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-# class Cart(models.Model):
-   # pass
+class Cart(models.Model):
+    recipe = models.ForeignKey(Recipe, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
