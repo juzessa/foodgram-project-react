@@ -1,23 +1,27 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse, get_object_or_404, render
 from djoser.views import UserViewSet
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
-from http import HTTPStatus
+from django_filters.rest_framework import DjangoFilterBackend
 
-from recipes.models import Favourite, Follow, Ingredient, Recipe, Tag, User, Cart
-
+from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe, Tag,
+                            User)
+from .filters import RecipeFilter
 from .pagination import LimitNumberPagination
-from .serializers import (FollowCreateSerializer, IngredientSerializer,
+from .serializers import (CartSerializer, FavouriteSerializer,
+                          FollowCreateSerializer, IngredientSerializer,
                           ManyUserCreateSerializer, OneUserSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
-                          TagSerializer, FavouriteSerializer, CartSerializer)
+                          TagSerializer)
 
 User = get_user_model()
 
@@ -80,6 +84,8 @@ class RecipeViewSet(ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     authentication_classes = (TokenAuthentication,)
     pagination_class = LimitNumberPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.action == "create" or self.action == 'partial_update':

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'api',
     'recipes',
     'rest_framework.authtoken',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
