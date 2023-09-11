@@ -3,11 +3,11 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe,
-                            RecipeIngredient, RecipeTag, Tag, User)
+                            RecipeIngredient, Tag, User)
 
 
 class OneUserSerializer(UserSerializer):
-    #count = serializers.SerializerMethodField()
+    # count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -26,8 +26,8 @@ class OneUserSerializer(UserSerializer):
             user=user, author=obj
         ).exists()
 
-    #def get_count(self, obj):
-        #return User.objects.all().count()
+    # def get_count(self, obj):
+        # return User.objects.all().count()
 
 
 class ManyUserCreateSerializer(UserCreateSerializer):
@@ -83,18 +83,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time',
-            'is_favorited', 
+            'is_favorited',
             'is_in_shopping_cart',
             'author')
-    
+
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         return Favourite.objects.filter(user=request.user, recipe=obj).exists()
-    
+
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
         return Cart.objects.filter(user=user, recipe=obj).exists()
-
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -178,6 +177,7 @@ class FavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favourite
         fields = ('id', 'name', 'image', 'cooking_time')
+
 
 class CartSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='recipe.id')

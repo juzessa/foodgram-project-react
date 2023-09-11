@@ -1,20 +1,19 @@
 from http import HTTPStatus
 
-from django.contrib.auth import get_user_model
-from django.http import JsonResponse
-from django.shortcuts import HttpResponse, get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
+from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from django_filters.rest_framework import DjangoFilterBackend
 
 from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe, Tag,
                             User)
+
 from .filters import RecipeFilter
 from .pagination import LimitNumberPagination
 from .serializers import (CartSerializer, FavouriteSerializer,
@@ -22,8 +21,6 @@ from .serializers import (CartSerializer, FavouriteSerializer,
                           ManyUserCreateSerializer, OneUserSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           TagSerializer)
-
-User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
@@ -61,7 +58,8 @@ class CustomUserViewSet(UserViewSet):
         if request.method == 'POST':
             if author != user and not Follow.objects.filter(
                     user=user, author=author).exists():
-                serializer = FollowCreateSerializer(Follow.objects.create(author=author, user=user), context={'request': request})
+                serializer = FollowCreateSerializer(Follow.objects.create(
+                    author=author, user=user), context={'request': request})
                 return Response(serializer.data)
         else:
             if Follow.objects.filter(author=author, user=user).exists():
@@ -104,7 +102,9 @@ class RecipeViewSet(ModelViewSet):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            serializer = FavouriteSerializer(Favourite.objects.create(recipe=recipe, user=user))
+            serializer = FavouriteSerializer(
+                Favourite.objects.create(
+                    recipe=recipe, user=user))
             return Response(serializer.data)
         else:
             if Favourite.objects.filter(recipe=recipe, user=user).exists():
@@ -112,7 +112,7 @@ class RecipeViewSet(ModelViewSet):
                 unfollow.delete()
                 return Response(status=HTTPStatus.NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(
         methods=['GET'],
         detail=False,
@@ -130,7 +130,9 @@ class RecipeViewSet(ModelViewSet):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            serializer = CartSerializer(Cart.objects.create(recipe=recipe, user=user))
+            serializer = CartSerializer(
+                Cart.objects.create(
+                    recipe=recipe, user=user))
             return Response(serializer.data)
         else:
             if Cart.objects.filter(recipe=recipe, user=user).exists():
@@ -145,7 +147,3 @@ class IngredientViewSet(ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-def index(request):
-    return HttpResponse('index')

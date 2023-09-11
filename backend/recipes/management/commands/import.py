@@ -1,8 +1,8 @@
 import csv
 
 from django.core.management.base import BaseCommand
-from foodgram_backend import settings
 
+from foodgram_backend import settings
 from recipes.models import Ingredient
 
 PATH = f'{settings.BASE_DIR}/data/'

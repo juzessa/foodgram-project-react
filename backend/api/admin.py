@@ -28,13 +28,16 @@ class IngredientAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Favourite)
 class FavouriteAdmin(admin.ModelAdmin):
     pass
+
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
