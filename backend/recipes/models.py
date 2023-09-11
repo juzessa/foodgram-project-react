@@ -76,9 +76,11 @@ class RecipeTag(models.Model):
         Recipe, null=True, on_delete=models.SET_NULL)
     tag = models.ForeignKey(Tag, null=True, on_delete=models.SET_NULL)
 
+
 class Favourite(models.Model):
     recipe = models.ForeignKey(Recipe, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class Cart(models.Model):
     recipe = models.ForeignKey(Recipe, null=True, on_delete=models.CASCADE)
