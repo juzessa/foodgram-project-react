@@ -1,8 +1,12 @@
 from http import HTTPStatus
 
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe, Tag,
+                            User)
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -11,16 +15,13 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe, Tag,
-                            User)
-
 from .filters import RecipeFilter
 from .pagination import LimitNumberPagination
 from .serializers import (CartSerializer, FavouriteSerializer,
                           FollowCreateSerializer, IngredientSerializer,
                           ManyUserCreateSerializer, OneUserSerializer,
-                          RecipeCreateSerializer, RecipeSerializer,
-                          TagSerializer)
+                          RecipeCreateSerializer, RecipeIngredient,
+                          RecipeSerializer, TagSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -119,7 +120,31 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        pass
+        cart = Cart.objects.filter(user=self.request.user)
+        recipes = [item.recipe.id for item in cart]
+        buy = RecipeIngredient.objects.filter(
+            recipe__in=recipes
+        ).values(
+            'ingredient'
+        ).annotate(
+            amount=Sum('amount')
+        )
+
+        buy_list_text = 'Список покупок с сайта Foodgram:\n\n'
+        for item in buy:
+            ingredient = Ingredient.objects.get(pk=item['ingredient'])
+            amount = item['amount']
+            buy_list_text += (
+                f'{ingredient.name}, {amount} '
+                f'{ingredient.measurement_unit}\n'
+            )
+
+        response = HttpResponse(buy_list_text, content_type="text/plain")
+        response['Content-Disposition'] = (
+            'attachment; filename=shopping-list.txt'
+        )
+
+        return response
 
     @action(
         methods=['POST', 'DELETE'],

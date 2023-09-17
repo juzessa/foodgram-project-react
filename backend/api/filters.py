@@ -1,11 +1,17 @@
 import django_filters as filters
+from recipes.models import Favourite, Recipe
 
-from recipes.models import Recipe, User
+
+class FavouriteFilter(filters.FilterSet):
+    favourite = filters.BooleanFilter(
+        widget=filters.widgets.BooleanWidget())
+
+    class Meta:
+        model = Favourite
+        fields = ['recipe', 'favourite']
 
 
 class RecipeFilter(filters.FilterSet):
-    author = filters.ModelChoiceFilter(
-        queryset=User.objects.all())
     cart = filters.BooleanFilter(
         widget=filters.widgets.BooleanWidget())
     favourite = filters.BooleanFilter(

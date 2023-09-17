@@ -1,13 +1,11 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers
-
 from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe,
                             RecipeIngredient, Tag, User)
+from rest_framework import serializers
 
 
 class OneUserSerializer(UserSerializer):
-    # count = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -96,8 +94,16 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Cart.objects.filter(user=user, recipe=obj).exists()
 
 
+class IngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit',)
+
+
 class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False)
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         model = Recipe
@@ -109,12 +115,17 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time')
 
+    def validate_cooking_time(self, cooking_time):
+        if int(cooking_time) < 1:
+            raise serializers.ValidationError(
+                'Cлишком мало времени')
+        return cooking_time
 
-class IngredientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Ingredient
-        fields = '__all__'
+    def to_representation(self, recipe):
+        return RecipeSerializer(
+            recipe,
+            context={'request': self.context.get('request')}
+        ).data
 
 
 class RecipeFollowingSerializer(serializers.ModelSerializer):
