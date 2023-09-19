@@ -61,12 +61,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram_backend.wsgi.application'
 
 
-#DATABASES = {
-    #'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
-    #}
-#}
 DATABASES = {
     'default': {
         'ENGINE': os.getenv(
@@ -132,9 +126,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
     'PAGE_SIZE': 6
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    # 'rest_framework.permissions.IsAdminUser',
-    # ),
 }
 
 DJOSER = {
