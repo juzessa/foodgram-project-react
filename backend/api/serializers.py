@@ -1,8 +1,10 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import (Cart, Favourite, Follow, Ingredient, Recipe,
-                            RecipeIngredient, Tag, User)
 from rest_framework import serializers
+
+from recipes.models import (Cart, Favourite, Ingredient, Recipe,
+                            RecipeIngredient, Tag)
+from users.models import Follow, User
 
 
 class OneUserSerializer(UserSerializer):
@@ -33,6 +35,44 @@ class ManyUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
         fields = ('username', 'password', 'first_name', 'last_name', 'email')
+
+
+class FollowCreateSerializer(serializers.ModelSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+    id = serializers.IntegerField(source='author.id')
+    email = serializers.EmailField(source='author.email')
+    username = serializers.CharField(source='author.username')
+    first_name = serializers.CharField(source='author.first_name')
+    last_name = serializers.CharField(source='author.last_name')
+
+    class Meta:
+        model = Follow
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes_count',
+            'recipes'
+        )
+
+    def get_is_subscribed(self, obj):
+        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
+
+    def get_recipes(self, obj):
+        request = self.context['request']
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj.author)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return RecipeFollowingSerializer(queryset, many=True).data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.author).count()
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -139,44 +179,6 @@ class RecipeFollowingSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time',
         )
-
-
-class FollowCreateSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
-    id = serializers.IntegerField(source='author.id')
-    email = serializers.EmailField(source='author.email')
-    username = serializers.CharField(source='author.username')
-    first_name = serializers.CharField(source='author.first_name')
-    last_name = serializers.CharField(source='author.last_name')
-
-    class Meta:
-        model = Follow
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes_count',
-            'recipes'
-        )
-
-    def get_is_subscribed(self, obj):
-        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
-
-    def get_recipes(self, obj):
-        request = self.context['request']
-        limit = request.GET.get('recipes_limit')
-        queryset = Recipe.objects.filter(author=obj.author)
-        if limit:
-            queryset = queryset[:int(limit)]
-        return RecipeFollowingSerializer(queryset, many=True).data
-
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj.author).count()
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
