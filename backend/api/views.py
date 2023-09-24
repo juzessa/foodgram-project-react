@@ -1,7 +1,5 @@
 from http import HTTPStatus
 
-from django.db.models import Sum
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
@@ -15,14 +13,14 @@ from rest_framework.viewsets import ModelViewSet
 
 from recipes.models import Cart, Favourite, Ingredient, Recipe, Tag
 from users.models import Follow, User
-
 from .filters import RecipeFilter
+from .function import cart_down
 from .pagination import LimitNumberPagination
 from .serializers import (CartSerializer, FavouriteSerializer,
                           FollowCreateSerializer, IngredientSerializer,
                           ManyUserCreateSerializer, OneUserSerializer,
-                          RecipeCreateSerializer, RecipeIngredient,
-                          RecipeSerializer, TagSerializer)
+                          RecipeCreateSerializer, RecipeSerializer,
+                          TagSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -121,31 +119,7 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def download_shopping_cart(self, request):
-        cart = Cart.objects.filter(user=self.request.user)
-        recipes = [item.recipe.id for item in cart]
-        buy = RecipeIngredient.objects.filter(
-            recipe__in=recipes
-        ).values(
-            'ingredient'
-        ).annotate(
-            amount=Sum('amount')
-        )
-
-        buy_list_text = 'Список покупок с сайта Foodgram:\n\n'
-        for item in buy:
-            ingredient = Ingredient.objects.get(pk=item['ingredient'])
-            amount = item['amount']
-            buy_list_text += (
-                f'{ingredient.name}, {amount} '
-                f'{ingredient.measurement_unit}\n'
-            )
-
-        response = HttpResponse(buy_list_text, content_type="text/plain")
-        response['Content-Disposition'] = (
-            'attachment; filename=shopping-list.txt'
-        )
-
-        return response
+        return cart_down(request)
 
     @action(
         methods=['POST', 'DELETE'],

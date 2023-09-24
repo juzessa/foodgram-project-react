@@ -1,8 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from users.models import User
-
 from .constants import COLOR, TWOHUNDRED
 
 
@@ -12,7 +10,6 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=TWOHUNDRED, unique=True)
 
     class Meta:
-        ordering = ['id', ]
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 
@@ -25,7 +22,6 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(max_length=TWOHUNDRED)
 
     class Meta:
-        ordering = ['id', ]
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         constraints = (
@@ -60,7 +56,7 @@ class Recipe(models.Model):
         db_index=True)
 
     class Meta:
-        ordering = ['-pub_date', ]
+        ordering = ('-pub_date', )
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -83,7 +79,7 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'РецептИнгредиенты'
 
     def __str__(self):
-        return self.name
+        return self.recipe
 
 
 class RecipeTag(models.Model):
@@ -94,9 +90,6 @@ class RecipeTag(models.Model):
     class Meta:
         verbose_name = 'РецептТэг'
         verbose_name_plural = 'РецептТэги'
-
-    def __str__(self):
-        return self.name
 
 
 class BaseContent(models.Model):
@@ -113,14 +106,8 @@ class Favourite(BaseContent):
         verbose_name = 'Любимое'
         verbose_name_plural = 'Любимые'
 
-    def __str__(self):
-        return self.name
-
 
 class Cart(BaseContent):
 
     class Meta:
         verbose_name = 'Корзина'
-
-    def __str__(self):
-        return self.name

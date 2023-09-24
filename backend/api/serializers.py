@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -25,9 +26,6 @@ class OneUserSerializer(UserSerializer):
         return Follow.objects.filter(
             user=user, author=obj
         ).exists()
-
-    # def get_count(self, obj):
-        # return User.objects.all().count()
 
 
 class ManyUserCreateSerializer(UserCreateSerializer):
@@ -154,6 +152,35 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'name',
             'text',
             'cooking_time')
+
+    def validate(self, data):
+        ingredients = data['ingredients']
+        ingredient_list = []
+        for items in ingredients:
+            ingredient = get_object_or_404(
+                Ingredient, id=items['id'])
+            if ingredient in ingredient_list:
+                raise serializers.ValidationError(
+                    'Ингредиент не может повторяться')
+            ingredient_list.append(ingredient)
+        tags = data['tags']
+        if not tags:
+            raise serializers.ValidationError(
+                'Нужен хотя бы один тэг')
+        for tag_name in tags:
+            if not Tag.objects.filter(name=tag_name).exists():
+                raise serializers.ValidationError('Тэга не существует')
+        return data
+
+    def validate_ingredients(self, ingredients):
+        if not ingredients:
+            raise serializers.ValidationError(
+                'Хотя бы 1 ингредиент в рецепте')
+        for ingredient in ingredients:
+            if int(ingredient.get('amount')) < 1:
+                raise serializers.ValidationError(
+                    'Количество ингредиента >= 1')
+        return ingredients
 
     def validate_cooking_time(self, cooking_time):
         if int(cooking_time) < 1:

@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
 from recipes.constants import EMAIL, ONEHUNDREDFIFTY
 
 
@@ -9,6 +8,13 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=ONEHUNDREDFIFTY)
     last_name = models.CharField(max_length=ONEHUNDREDFIFTY)
     username = models.CharField(max_length=ONEHUNDREDFIFTY, unique=True)
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.email
 
 
 class Follow(models.Model):
@@ -35,4 +41,4 @@ class Follow(models.Model):
             ),)
 
     def __str__(self):
-        return self.name
+        return f'Пользователь {self.user} -> автор {self.author}'

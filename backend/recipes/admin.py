@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from users.models import Follow, User
-
 from .models import Cart, Favourite, Ingredient, Recipe, RecipeIngredient, Tag
 
 
@@ -22,16 +20,6 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
     pass
 
 
