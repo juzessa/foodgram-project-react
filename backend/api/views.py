@@ -14,13 +14,13 @@ from rest_framework.viewsets import ModelViewSet
 from recipes.models import Cart, Favourite, Ingredient, Recipe, Tag
 from users.models import Follow, User
 from .filters import RecipeFilter
-from .function import cart_down
 from .pagination import LimitNumberPagination
 from .serializers import (CartSerializer, FavouriteSerializer,
                           FollowCreateSerializer, IngredientSerializer,
                           ManyUserCreateSerializer, OneUserSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           TagSerializer)
+from .utils import cart_down
 
 
 class CustomUserViewSet(UserViewSet):
