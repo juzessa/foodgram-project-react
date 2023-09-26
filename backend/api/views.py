@@ -3,6 +3,7 @@ from http import HTTPStatus
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from recipes.models import Cart, Favourite, Ingredient, Recipe, Tag
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -10,9 +11,8 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
-from recipes.models import Cart, Favourite, Ingredient, Recipe, Tag
 from users.models import Follow, User
+
 from .filters import RecipeFilter
 from .pagination import LimitNumberPagination
 from .serializers import (CartSerializer, FavouriteSerializer,
