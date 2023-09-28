@@ -14,7 +14,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.email
+        return self.email or ''
 
 
 class Follow(models.Model):

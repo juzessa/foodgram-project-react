@@ -15,7 +15,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Тэги'
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 
 class Ingredient(models.Model):
@@ -32,7 +32,7 @@ class Ingredient(models.Model):
             ), )
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 
 class Recipe(models.Model):
@@ -62,7 +62,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.name
+        return self.name or ''
 
 
 class RecipeIngredient(models.Model):
@@ -80,7 +80,7 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'РецептИнгредиенты'
 
     def __str__(self):
-        return self.recipe
+        return self.recipe or ''
 
 
 class RecipeTag(models.Model):

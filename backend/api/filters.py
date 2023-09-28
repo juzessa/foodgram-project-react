@@ -19,6 +19,9 @@ class RecipeFilter(filters.FilterSet):
     tags = filters.AllValuesMultipleFilter(
         field_name='tags__slug')
 
+    def favorite_filter(self, queryset, name, value):
+        return Recipe.objects.filter(favorite__user=self.request.user)
+
     class Meta:
         model = Recipe
         fields = ['author', 'tags', 'favourite', 'cart']
