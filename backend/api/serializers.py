@@ -179,6 +179,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 amount=ingredient.get('amount'), )
 
     def create(self, validated_data):
+        name = validated_data.pop('name')
+        if name.upper() == name and name.lower() == name:
+            raise serializers.ValidationError(
+                'Добавь буквы в название рецепта'
+            )
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
@@ -187,6 +192,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
+        name = validated_data.pop('name')
+        if name.upper() == name and name.lower() == name:
+            raise serializers.ValidationError(
+                'Добавь буквы в название рецепта'
+            )
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
